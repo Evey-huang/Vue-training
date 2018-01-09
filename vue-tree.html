@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>vue tree</title>
+	<script src="https://cdn.bootcss.com/vue/2.5.13/vue.js"></script>
+<!-- 子组件 -->
+	<script type="text/x-template" id="item-template">
+	  <li>
+	    <div :class="{bold: isFolder}" @click="toggle" @dblclick="changeType">
+	      {{model.name}}
+	      <span v-if="isFolder">[{{open ? '-' : '+'}}]</span>
+	    </div>
+	    <ul v-show="open" v-if="isFolder">
+	      <item class="item" v-for="model in model.children" :model="model"></item>
+	      <li class="add" @click="addChild">+</li>
+	    </ul>
+	  </li>
+	</script>
+	<style type="text/css">
+		body {
+		/*   monospace字体等宽 */
+		  font-family: Menlo, Consolas, monospace;
+		  color: #444;
+		}
+		.item {
+		  cursor: pointer;
+		}
+		.bold {
+		  font-weight: bold;
+		}
+		p {
+		  color: red
+		}
+		ul {
+		  padding-left: 1em;
+		  line-height: 1.5em;
+		  list-style-type: dot;
+		}
+	</style>
+</head>
+<body>
+	<!-- 提示 -->
+	<p>这是一个简单的树形视图实现，它展现了组件的递归使用</p>
+	<p>(你可以双击一个项目使其变成一个文件夹.)</p>
+	<!-- 父组件 -->
+	<ul id="demo">
+	  <item class="item" :model="treeData"></item>
+	</ul>
+	<script type="text/javascript">
+		/* 定义项目组件 */
+		Vue.component('item', {
+		  template: '#item-template',
+		  props: {
+		    model: Object
+		  },
+		  data: function () {
+		    return {
+		      open: false
+		    }
+		  },
+		  computed: {
+		    isFolder: function () {
+		      return this.model.children && this.model.children.length
+		    }
+		  },
+		  methods: {
+		    toggle: function () {
+		      if (this.isFolder) {
+		        this.open = !this.open
+		      }
+		    },
+		    changeType: function () {
+		      if (!this.isFolder) {
+		        Vue.set(this.model, 'children', [])
+		        this.addChild()
+		        this.open = true
+		      }
+		    },
+		    addChild: function () {
+		      this.model.children.push({
+		        name: 'new stuff'
+		      })
+		    }
+		  }
+		})
+		/* 展示 */
+		var demo = new Vue({
+		  el: '#demo',
+		  data: {
+		    treeData: {
+		      name: 'My Tree',
+		      children: [
+		        { name: 'child1' },
+		        { name: 'child2' },
+		        {
+		          name: 'child3',
+		          children: [
+		            {
+		              name: 'child1',
+		              children: [
+		                { name: 'child1' },
+		                { name: 'child2' }
+		              ]
+		            },
+		            { name: 'child2' },
+		            { name: 'child3'},
+		            {
+		              name: 'child4',
+		              children: [
+		                { name: 'child1' },
+		                { name: 'child2' }
+		              ]
+		            }
+		         ]
+		       }
+		     ]
+		    }
+		  }
+		})
+	</script>
+</body>
+</html>
